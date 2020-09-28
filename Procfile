@@ -1,1 +1,1 @@
-web: gunicorn app:packing-optimizer
+web: gunicorn app:app
