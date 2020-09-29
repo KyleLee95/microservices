@@ -677,7 +677,7 @@ def post_something():
         Crate_dims.append([H_dim, W_dim, D_dim])
     orientations = Packings
    
-    return json.dumps({'test': orientations})
+    return json.dumps({'furniture': orientations})
 
 # A welcome message to test our server
 @app.route('/')
