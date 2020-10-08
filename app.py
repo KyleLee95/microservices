@@ -193,6 +193,33 @@ def post_something():
     #### CODE UP THE BOUNDING BOX ONES TOO!! THESE SEEM LIKELY
     #### CANDIDATES FOR US...
 
+    def Merit_WD(Dims, OR, EP, curr_items, curr_eps):
+        '''
+        Selects position that minimizes the bounding 
+        box in the WxD dimension
+        
+        curr_items = items in crate
+        curr_eps = position of items 
+        EP = candidate position 
+        OR = candidate orientation
+        '''
+        Dim = re_order(Dims,OR)
+        CI = curr_items
+        CE = curr_eps
+        ''' 
+        start out with the box bounds as the new guy
+        '''
+        W = EP[1] + Dim[1]
+        D =  EP[2] + Dim[2]
+        for i in range(len(CI)):
+            if CE[i][1] + CI[i][1] > W:
+                W = CE[i][1] + CI[i][1]
+            if CE[i][2] + CI[i][2] > D:
+                D = CE[i][2] + CI[i][2]
+        #Penalizes Height
+        val = W*D + (EP[0] + Dim[0]) * W
+        return(val)
+
     '''
     Update Extreme point list
     '''
@@ -346,9 +373,9 @@ def post_something():
 
     # Maximum box dimensions
     # need to make sure that dimensions are big enough to handle each piece...
-    H_box = 100
-    W_box = 100
-    D_box = 100
+    H_box = 40
+    W_box = 60
+    D_box = 48
 
 
     #e_ST is the "allowed overhang" of the nesting in this case...is this a thing??
@@ -532,13 +559,18 @@ def post_something():
             Ordered_EPL = []
 
             for e in range(len(EPL)):
+                if EPL[e][0] > 0: 
+                    # no stacking
+                    continue
                 for o in range(len(Ors)):
                     ''' Skip if an orientation exception '''
                     if ptp[p][1] in Or_Ex and o in Or_Ex[ptp[p][1]]:
                         continue
 
-                    if Feas(Dims, EPL[e], Bin_size, Ors[o], Curr_Items, Curr_EP) and Merit_Res(Dims, Ors[o], EPL[e], RS_List[e], Bin_size) < Best_Merit:
-                        Best_Merit = Merit_Res(Dims, Ors[o], EPL[e], RS_List[e], Bin_size)
+                    #if Feas(Dims, EPL[e], Bin_size, Ors[o], Curr_Items, Curr_EP) and Merit_Res(Dims, Ors[o], EPL[e], RS_List[e], Bin_size) < Best_Merit:
+                    if Feas(Dims, EPL[e], Bin_size, Ors[o], Curr_Items, Curr_EP) and Merit_WD(Dims, Ors[o], EPL[e], Curr_Items, Curr_EP) < Best_Merit:
+                        #Best_Merit = Merit_Res(Dims, Ors[o], EPL[e], RS_List[e], Bin_size)
+                        Best_Merit = Merit_WD(Dims, Ors[o], EPL[e], Curr_Items, Curr_EP)
                         e_cand = e
                         o_cand = o
                         packed_in = c
@@ -621,8 +653,10 @@ def post_something():
                 if ptp[p][1] in Or_Ex and o in Or_Ex[ptp[p][1]]:
                     continue
 
-                if  Feas(Dims, EPL[e_cand], Bin_size, Ors[o], Curr_Items, Curr_EP) and Merit_Res(Dims, Ors[o], EPL[e_cand], RS_List[e_cand], Bin_size) < Best_Merit:
-                    Best_Merit = Merit_Res(Dims, Ors[o], EPL[e_cand], RS_List[e_cand], Bin_size)
+                #if  Feas(Dims, EPL[e_cand], Bin_size, Ors[o], Curr_Items, Curr_EP) and Merit_Res(Dims, Ors[o], EPL[e_cand], RS_List[e_cand], Bin_size) < Best_Merit:
+                if  Feas(Dims, EPL[e_cand], Bin_size, Ors[o], Curr_Items, Curr_EP) and Merit_WD(Dims, Ors[o], EPL[e_cand], Curr_Items, Curr_EP) < Best_Merit:
+                    #Best_Merit = Merit_Res(Dims, Ors[o], EPL[e_cand], RS_List[e_cand], Bin_size)
+                    Best_Merit = Merit_WD(Dims, Ors[o], EPL[e_cand], Curr_Items, Curr_EP) < Best_Merit
                     o_cand = o
 
             Dims = re_order(Dims, Ors[o_cand])
@@ -694,6 +728,8 @@ def post_something():
 
 @app.route('/stockCutting/', methods=["POST"])
 def optimize_stock():
+    data = request.get_json()
+    panels = data['dimensions']
     x = []
     '''
     Sketches for IP model for cutting stock -- 
@@ -729,7 +765,21 @@ def optimize_stock():
     the dict  for now is: 
     {(Part) i: [length, height]}
     '''
-    PARTS = {1: [72.0, 36.0], 2:[24.,48.0], 3:[60., 36.0]}
+
+
+    PARTS = {
+    1: [39.54, 9.37],
+    2: [39.54, 9.37],
+    3: [39.54, 9.37],
+    4: [39.54, 9.37],
+    5: [39.54, 9.37],
+    6: [39.54, 9.37],
+    7: [39.54, 9.37],
+    8: [38.04, 2],
+    9: [61.68, 9.940],
+    10: [61.68, 9.940]
+  }
+
 
     ### Initialize indices for 
     N = [i for i in range(len(PARTS))]
@@ -893,10 +943,9 @@ def optimize_stock():
         Could (should?) also include sheet size (and big M's)
         as inputs here...
         '''
-        x = Solve(Model(parts))
+      
         return Solve(Model(parts))	
-    return Cutting_stock({1: [72.0, 36.0], 2:[24.,48.0], 3:[60., 36.0]})
-    
+    return "A"
 @app.route('/')
 def index():
     return "<h1>Welcome to our server !!</h1>"
