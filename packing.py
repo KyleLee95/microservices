@@ -7,6 +7,8 @@ def pack(request):
     orientations =  []
     
     '''
+    Test
+    
     ** Nearly Pure Python ** Implementation of the Extreme-point
     Heuristic for 3D-Bin-Packing from:
     "Extreme Point-Based Heuristics for Three-Dimensional Bin
