@@ -9,7 +9,6 @@ app = Flask(__name__)
 def respond():
     # Retrieve the name from url parameter
     name = request.args.get("name", None)
-  
     # For debugging
     print(f"got name {name}")
 
