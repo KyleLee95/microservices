@@ -318,7 +318,7 @@ def stock_cutting(request):
 				EPL = [EPL[order_i[j]] for j in range(len(order_i))]
 				# added in the margin on the outside of the sheet to the x and y 
 				# i.e. shift things by (1,1) to give the location on the original sheet 
-				Result = [ptp[p][2], {'part': ptp[p][0], 'x': Cr_EPs[k][L-1][0] + margin , 'y': Cr_EPs[k][L-1][1]+ margin + (5+Actual_dim[1])*packed_in}]
+				Result = [ptp[p][2], {'part': ptp[p][0], 'x': int(Cr_EPs[k][L-1][0] + margin) , 'y': int(Cr_EPs[k][L-1][1]+ margin + (5+Actual_dim[1])*packed_in)}]
 		
 	
 			Packings.append(Result)
@@ -356,7 +356,7 @@ def stock_cutting(request):
 				EPL = [EPL[order_i[j]] for j in range(len(order_i))]
 			# added in the margin on the outside of the sheet to the x and y 
 			# i.e. shift things by (1,1) to give the location on the original sheet 
-			Result = [ptp[p][2],{'part': ptp[p][0], 'x': Cr_EPs[c][L-1][0]+margin , 'y': Cr_EPs[c][L-1][1]+ margin + (5+ Actual_dim[1])*packed_in}]
+			Result = [ptp[p][2],{'part': ptp[p][0], 'x': int(Cr_EPs[c][L-1][0]+margin) , 'y': int(Cr_EPs[c][L-1][1]+ margin + (5+ Actual_dim[1])*packed_in)}]
 			Packings.append(Result)
 			SH[c] = EPL
 			Cr_Item[c] = Curr_Items 
