@@ -1,17 +1,21 @@
+''' ** Nearly Pure Python ** Implementation of the 
+Extreme-point BFD-Heuristic for 2D-Cutting Stock Problem:
+
+Based on "Extreme Point-Based Heuristics for 
+Three-Dimensional Bin Packing" INFORMS Journal 
+on Computing (2008)  Teodor Gabriel Crainic, Guido Perboli, 
+Roberto Tadei,
+'''
+
+
+import json
 import numpy as np
+
 
 def stock_cutting(request):
     data = request.get_json()
     pieces = data['dimensions']
-	'''
-	** Nearly Pure Python ** Implementation of the 
-	Extreme-point BFD-Heuristic for 2D-Cutting Stock Problem:
 
-	Based on "Extreme Point-Based Heuristics for 
-	Three-Dimensional Bin Packing" INFORMS Journal 
-	on Computing (2008)  Teodor Gabriel Crainic, Guido Perboli, 
-	Roberto Tadei,
-	'''
 
 	##################################################################
 	#######   Preliminary Functions
@@ -20,12 +24,8 @@ def stock_cutting(request):
 
 	## NEED TO IMPLEMENT THIS!!! AND TRY RANDOMIZING THE 
 	## ORDER AND KEEPING TRACK OF THE "USABLE WASTE"...
+	
 	def order(x,vals):
-		'''
-		idea is to apply this to the pieces, with different
-		vectors for vals depending on the ordering rule 
-		(probably start with non-increasing volume)
-		'''
 		x = [i for _,i in sorted(zip(vals,x), reverse = True)]
 		return x
 
@@ -174,14 +174,14 @@ def stock_cutting(request):
 	
 		for i in range(len(CI)):
 			# shrinking y coordinate
-			if proj(D, EP, CI[i], CE[i],1) and CE[i][1] + CI[i][1] > Max_bounds[1]:
-				New_Eps[0] = [EP[0] + D[0], CE[i][1] + CI[i][1] + p_m]
+			if proj(D, EP, CI[i], CE[i],1) and CE[i][1] + CI[i][1] + p_m > Max_bounds[1]:
+				New_Eps[0] = [EP[0] + D[0] + p_m, CE[i][1] + CI[i][1] + p_m]
 				Max_bounds[0] = CE[i][1] + CI[i][1] + p_m
 			
 	
 			# shrinking x coordinate
-			if proj(D, EP, CI[i], CE[i],0) and CE[i][0] + CI[i][0] > Max_bounds[0]:
-				New_Eps[1] = [CE[i][0] + CI[i][0] + p_m, EP[1] + D[1]]
+			if proj(D, EP, CI[i], CE[i],0) and CE[i][0] + CI[i][0] + p_m > Max_bounds[0]:
+				New_Eps[1] = [CE[i][0] + CI[i][0] + p_m, EP[1] + D[1] + p_m]
 				Max_bounds[1] = CE[i][0] + CI[i][0] + p_m	
 			
 		# remove duplicates
@@ -216,9 +216,8 @@ def stock_cutting(request):
 	Piece_Margin = 1.0
 
 	## part label, width, depth
-		## part label, width, depth
-		PARTS = pieces
-		
+	PARTS = pieces
+	
 	labels = list(PARTS.keys())
 	parts = []
 	for i in range(len(labels)):
@@ -317,7 +316,7 @@ def stock_cutting(request):
 				EPL = [EPL[order_i[j]] for j in range(len(order_i))]
 				# added in the margin on the outside of the sheet to the x and y 
 				# i.e. shift things by (1,1) to give the location on the original sheet 
-				Result = [ptp[p][2], {'part': ptp[p][0], 'x': int(Cr_EPs[k][L-1][0] + margin) , 'y': int(Cr_EPs[k][L-1][1]+ margin + (5+Actual_dim[1])*packed_in)}]
+				Result = [ptp[p][2], {'part': ptp[p][0], 'x': Cr_EPs[k][L-1][0] + margin , 'y': Cr_EPs[k][L-1][1]+ margin + (5+Actual_dim[1])*packed_in}]
 		
 	
 			Packings.append(Result)
@@ -355,7 +354,7 @@ def stock_cutting(request):
 				EPL = [EPL[order_i[j]] for j in range(len(order_i))]
 			# added in the margin on the outside of the sheet to the x and y 
 			# i.e. shift things by (1,1) to give the location on the original sheet 
-			Result = [ptp[p][2],{'part': ptp[p][0], 'x': int(Cr_EPs[c][L-1][0]+margin) , 'y': int(Cr_EPs[c][L-1][1]+ margin + (5+ Actual_dim[1])*packed_in)}]
+			Result = [ptp[p][2],{'part': ptp[p][0], 'x': Cr_EPs[c][L-1][0]+margin , 'y': Cr_EPs[c][L-1][1]+ margin + (5+ Actual_dim[1])*packed_in}]
 			Packings.append(Result)
 			SH[c] = EPL
 			Cr_Item[c] = Curr_Items 
