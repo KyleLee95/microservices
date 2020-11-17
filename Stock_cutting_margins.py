@@ -3,7 +3,6 @@ import numpy as np
 def stock_cutting(request):
     data = request.get_json()
     pieces = data['dimensions']
-
 	'''
 	** Nearly Pure Python ** Implementation of the 
 	Extreme-point BFD-Heuristic for 2D-Cutting Stock Problem:
